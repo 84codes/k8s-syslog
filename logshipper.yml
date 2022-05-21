@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logshipper-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: default
+  name: logshipper-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: logshipper-reader-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: logshipper-reader
+subjects:
+- kind: ServiceAccount
+  name: logshipper-sa
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logshipper
+  namespace: "default"
+  labels:
+    app: logshipper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logshipper
+  template:
+    metadata:
+      labels:
+        kail.ignore: "true"
+        app: logshipper
+    spec:
+      serviceAccountName: logshipper-sa
+      containers:
+      - image: ghcr.io/84codes/logshipper
+        name: logshipper
