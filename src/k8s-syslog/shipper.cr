@@ -53,12 +53,15 @@ module K8sSyslog
       pods.each do |pod|
         spawn stream_logs(pod)
       end
+    rescue ex
+      STDERR.puts "ERROR while watching pods", ex.inspect_with_backtrace
+    ensure
       @ch.close # should not happen so empty buffer and exit
     end
 
     private def stream_logs(pod)
       pod.logs do |message|
-        @ch.send(Syslog.line(pod.name, :app, message))
+        @ch.send(Syslog.line(pod.pod, pod.container, message))
       end
     rescue Channel::ClosedError
       # closed by TERM/INT
