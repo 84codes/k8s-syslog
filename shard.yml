@@ -8,6 +8,10 @@ targets:
   k8s-syslog:
     main: src/k8s-syslog.cr
 
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba
+
 crystal: 1.4.1
 
 license: MIT
