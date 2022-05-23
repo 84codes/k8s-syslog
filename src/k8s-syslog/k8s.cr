@@ -10,6 +10,7 @@ module K8sSyslog
       end
     end
 
+    # https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/
     def initialize
       if File.exists? "/var/run/secrets/kubernetes.io/serviceaccount/token"
         token = File.read("/var/run/secrets/kubernetes.io/serviceaccount/token")
@@ -24,6 +25,7 @@ module K8sSyslog
   end
 
   class Pods < K8s
+    # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#list-all-namespaces-pod-v1-core
     def each(&)
       @client.get("/api/v1/pods?watch&fieldSelector=status.phase=Running") do |resp|
         raise Error.new(resp.body_io.gets_to_end) if resp.status_code != 200
@@ -57,17 +59,20 @@ module K8sSyslog
 
     getter container, pod, namespace
 
+    # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#read-log-pod-v1-core
     def logs(&)
-      @client.get("/api/v1/namespaces/#{@namespace}/pods/#{@pod}/log?follow&tailLines=0&container=#{container}") do |response|
+      @client.get("/api/v1/namespaces/#{@namespace}/pods/#{@pod}/log?follow&tailLines=0&container=#{@container}") do |response|
         case response.status_code
         when 200
           while message = response.body_io.gets
             yield message unless message.empty?
           end
         else
-          puts "pod=#{@name} broken-stream #{JSON.parse(response.body_io)}"
+          puts "pod=#{@pod} error=#{response.body_io.gets_to_end}"
         end
       end
+    ensure
+      puts "stopped reading logs for pod=#{@pod} container=#{@container} namespace=#{@namespace}"
     end
   end
 
