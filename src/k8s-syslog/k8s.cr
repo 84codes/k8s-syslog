@@ -32,7 +32,7 @@ module K8sSyslog
             name = data.dig("object", "metadata", "name").as_s
             namespace = data.dig("object", "metadata", "namespace").as_s
             puts "pod=#{name} type=#{type}"
-            next unless name.starts_with? "neg-"
+            # next unless name.starts_with? "neg-"
             case type
             when "ADDED"
               yield Pod.new(name, namespace)
