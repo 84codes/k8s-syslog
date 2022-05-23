@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 COPY shard.yml shard.lock ./
 RUN shards install --production
 COPY src/ src/
-RUN shards build # --release
+RUN shards build --production # --release
 
 FROM alpine:edge
 RUN apk add --update --no-cache libevent libgcc pcre libssl3
