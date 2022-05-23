@@ -1,10 +1,7 @@
-require "socket"
-require "http/client"
-require "json"
-require "./logshipper/syslog"
-require "./logshipper/k8s"
+require "./k8s-syslog/k8s"
+require "./k8s-syslog/syslog"
 
-module Logshipper
+module K8sSyslog
   VERSION = "0.1.0"
 
   class Shipper
@@ -59,4 +56,4 @@ module Logshipper
   end
 end
 
-Logshipper::Shipper.new.run
+K8sSyslog::Shipper.new.run

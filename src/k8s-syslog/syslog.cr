@@ -1,6 +1,6 @@
 require "socket"
 
-module Logshipper
+module K8sSyslog
   class Syslog
     def initialize(@io : IO)
     end

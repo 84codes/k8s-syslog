@@ -1,12 +1,12 @@
-name: logshipper
+name: k8s-syslog
 version: 0.1.0
 
 authors:
   - Carl Hörberg <carl@84codes.com>
 
 targets:
-  logshipper:
-    main: src/logshipper.cr
+  k8s-syslog:
+    main: src/k8s-syslog.cr
 
 crystal: 1.4.1
 

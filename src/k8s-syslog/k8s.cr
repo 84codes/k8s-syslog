@@ -1,4 +1,7 @@
-module Logshipper
+require "http/client"
+require "json"
+
+module K8sSyslog
   abstract class K8s
     def initialize
       if File.exists? "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -21,7 +24,7 @@ module Logshipper
     def each(&)
       loop do
         @client.get("/api/v1/namespaces/#{@namespace}/pods?watch&fieldSelector=status.phase=Running") do |resp|
-          raise Error.new if response.status_code != 200
+          raise Exception.new if resp.status_code != 200
 
           while json = resp.body_io.gets
             data = JSON.parse(json)
