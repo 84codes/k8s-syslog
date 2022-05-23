@@ -24,6 +24,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: k8s-syslog-sa
+  namespace: kube-system
 ---
 apiVersion: apps/v1
 kind: Deployment

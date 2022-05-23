@@ -27,7 +27,6 @@ jobs:
       - run: bin/ameba --no-color
 
   spec:
-    name: Spec
     runs-on: ubuntu-latest
     container: 84codes/crystal
     steps:
