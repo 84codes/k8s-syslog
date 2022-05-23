@@ -36,7 +36,6 @@ module K8sSyslog
           pod_name = data.dig("object", "metadata", "name").as_s
           namespace = data.dig("object", "metadata", "namespace").as_s
           puts "pod=#{pod_name} type=#{type}"
-          # next unless pod_name.starts_with? "neg-"
           case type
           when "ADDED"
             containers = data.dig("object", "spec", "containers").as_a
