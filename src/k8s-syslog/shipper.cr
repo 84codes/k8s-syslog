@@ -18,7 +18,7 @@ module K8sSyslog
       rescue ex : Channel::ClosedError
         exit 1  # closed by INT/TERM
       rescue ex # retry on all other errors
-        STDERR.puts "ERROR syslog: #{ex.message}"
+        puts "[ERROR] syslog_loop", ex.inspect_with_backtrace
         sleep 1
       end
     end
@@ -54,13 +54,13 @@ module K8sSyslog
         spawn stream_logs(pod)
       end
     rescue ex
-      STDERR.puts "ERROR while watching pods", ex.inspect_with_backtrace
+      puts "[ERROR] watch_pods", ex.inspect_with_backtrace
     ensure
       @ch.close # should not happen so empty buffer and exit
     end
 
     private def stream_logs(pod)
-      pod.logs do |message|
+      pod.follow_logs do |message|
         @ch.send(Syslog.line(pod.pod, pod.container, message))
       end
     rescue Channel::ClosedError

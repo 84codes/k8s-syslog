@@ -35,7 +35,6 @@ module K8sSyslog
           type = data["type"].as_s
           pod_name = data.dig("object", "metadata", "name").as_s
           namespace = data.dig("object", "metadata", "namespace").as_s
-          puts "pod=#{pod_name} type=#{type}"
           case type
           when "ADDED"
             containers = data.dig("object", "spec", "containers").as_a
@@ -59,19 +58,20 @@ module K8sSyslog
     getter container, pod, namespace
 
     # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#read-log-pod-v1-core
-    def logs(&)
+    def follow_logs(&)
       @client.get("/api/v1/namespaces/#{@namespace}/pods/#{@pod}/log?follow&tailLines=0&container=#{@container}") do |response|
         case response.status_code
         when 200
+          puts "follow_logs started pod=#{@pod} container=#{@container}"
           while message = response.body_io.gets
             yield message unless message.empty?
           end
         else
-          puts "pod=#{@pod} error=#{response.body_io.gets_to_end}"
+          puts "[ERROR] follow_logs pod=#{@pod} container=#{@container} error=#{response.body_io.gets_to_end}"
         end
       end
     ensure
-      puts "stopped reading logs for pod=#{@pod} container=#{@container} namespace=#{@namespace}"
+      puts "follow_logs stopped pod=#{@pod} container=#{@container}"
     end
   end
 
