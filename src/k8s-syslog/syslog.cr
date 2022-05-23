@@ -6,14 +6,16 @@ module K8sSyslog
     def initialize(@io : IO)
     end
 
-    def self.line(hostname, component, message, ts = Time.utc, severity = :info) : String
+    def self.line(pod, container, message, ts = Time.utc, severity = :info) : String
       facility_nr = 17 # local1
       severity_nr = SEVERITES[severity]
       pri = facility_nr * 8 + severity_nr
-      String.build do |io|
+      podname = pod.lchop("#{container}-")
+      capacity = 37 + container.bytesize + podname.bytesize + message.bytesize
+      String.build(capacity) do |io|
         io << "<" << pri << ">1 "
         ts.to_rfc3339(io)
-        io << " " << hostname << " " << component
+        io << " " << container << " " << podname
         io << " - - - " << message << "\n"
       end
     end
