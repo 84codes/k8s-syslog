@@ -29,7 +29,6 @@ jobs:
     container: 84codes/crystal
     steps:
       - uses: actions/checkout@v3
-      - run: shards install
       - run: crystal spec --no-color --order random
 
   container:
